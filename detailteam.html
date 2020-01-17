@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Football Web App</title>
+    <meta name="description" content="My first PWA" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/materialize.min.css" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" type="text/css" href="css/style_custom.css">
+    <meta name="theme-color" content="#00897B" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+  <body>
+       <!-- Navigasi -->
+    <nav class="teal lighten-1" role="navigation">
+      <div class="nav-wrapper container">
+        <a href="#" class="brand-logo" id="logo-container">Team</a>
+        <a href="./index.html" class="sidenav-trigger" data-target="nav-mobile">
+          <!-- <i class="material-icons">arrow_back</i> -->
+          <img src="images/arrow_back.png">
+        </a>
+        <ul class="topnav right hide-on-med-and-down"></ul>
+        <ul class="sidenav" id="nav-mobile"></ul>
+      </div>
+    </nav>
+    <!-- Akhir Navigasi -->
+    <div class="container" id="body-content">
+        
+    </div>
+    <div class="fixed-action-btn" onclick="changeImage()">
+        <a class="btn-floating btn-large red" id="save">
+          <!-- <i id="iconFav" class="large material-icons"></i> -->
+          <img id="iconFav"   >
+        </a>
+    </div>
+    
+    <script src="https://unpkg.com/snarkdown@1.0.2/dist/snarkdown.umd.js"></script>
+    <script src="js/materialize.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/idb.js"></script>
+    <script src="js/db.js"></script>
+    <script>
+      // REGISTER SERVICE WORKER
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function() {
+          navigator.serviceWorker
+            .register("/football-sw.js")
+            .then(function() {
+              console.log("Pendaftaran ServiceWorker berhasil");
+            })
+            .catch(function() {
+              console.log("Pendaftaran ServiceWorker gagal");
+            });
+        });
+      } else {
+        console.log("ServiceWorker belum didukung browser ini.");
+      }
+
+        
+
+      document.addEventListener("DOMContentLoaded", function() {
+          var urlParams = new URLSearchParams(window.location.search);
+          var id = Number(urlParams.get("id"));
+          var save = document.getElementById("save");
+          var iconFav = document.getElementById("iconFav") ; 
+          var isFavorite = false ; 
+          
+          
+
+          checkDataFav(id).then(function(msg) {
+            console.log("resolve : " + msg) ; 
+            isFavorite = true ; 
+            iconFav.src = "images/favorite.png"; 
+            getFavoriteTeamById();
+          }).catch(function(msg){
+            console.log("reject : " + msg)
+            isFavorite = false ; 
+            iconFav.src = "images/unfavorite.png";
+            getDetailTeamById();
+          });
+          
+
+          save.onclick = function () {
+              console.log(isFavorite) ; 
+              if (isFavorite) {
+                    deleteFavTeam(id) ; 
+                    isFavorite = false ; 
+                  }else{
+                    item = getDetailTeamById();
+                    item.then(function (data) {
+                      saveFavoriteTeam(data)
+                    });
+                    isFavorite = true
+                  }
+          }
+
+          
+           
+      });
+
+      function changeImage(element)
+          {
+            var x = document.getElementById("iconFav");
+            var v = x.getAttribute("src");
+            if(v == "images/unfavorite.png")
+              v = "images/favorite.png";
+            else 
+              v = "images/unfavorite.png";
+            x.setAttribute("src", v); 
+          }
+    </script>
+  </body>
+</html>
